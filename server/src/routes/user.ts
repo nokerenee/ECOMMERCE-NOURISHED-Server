@@ -41,7 +41,7 @@ router.post("/login", async (req: Request, res: Response) => {
       return res.status(400).json({ type: UserErrors.WRONG_CREDENTIALS });
     }
 
-    const token = jwt.sign({ id: user._id }, "secret");
+    const token = jwt.sign({ id: user._id }, "Secret");
     res.json({ token, userID: user._id });
   } catch (err) {
     res.status(500).json({ type: err });
@@ -55,7 +55,7 @@ export const verifyToken = (
 ) => {
   const authHeader = req.headers.authorization;
   if (authHeader) {
-    jwt.verify(authHeader, "secret", (err) => {
+    jwt.verify(authHeader, "Secret", (err) => {
       if (err) {
         return res.sendStatus(403);
       }
