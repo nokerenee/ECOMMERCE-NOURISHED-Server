@@ -52,17 +52,36 @@ router.post("/checkout", verifyToken, async (req: Request, res: Response) => {
 
     user.availableMoney -= totalPrice;
     user.purchasedItems.push(...productIDs);
-    
+
     await user.save();
     await ProductModel.updateMany(
       { _id: { $in: productIDs } },
       { $inc: { stockQuantity: -1 } }
     );
     res.json({ purchasedItems: user.purchasedItems });
-
   } catch (err) {
     res.status(400).json(err);
   }
 });
+
+router.get(
+  "/purchased-items/:customerID",
+  verifyToken,
+  async (req: Request, res: Response) => {
+    const { customerID } = req.params;
+    try {
+      const user = await UserModel.findById(customerID);
+      if (!user) {
+        res.status(400).json({ type: UserErrors.NO_USER_FOUND });
+      }
+      const products = await ProductModel.find({
+        _id: { $in: user.purchasedItems },
+      });
+      res.json({ purchasedItems: products });
+    } catch (err) {
+      res.status(500).json({ err });
+    }
+  }
+);
 
 export { router as productRouter };
