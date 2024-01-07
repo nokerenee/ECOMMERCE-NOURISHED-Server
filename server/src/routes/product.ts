@@ -46,11 +46,6 @@ router.post("/checkout", verifyToken, async (req: Request, res: Response) => {
       totalPrice += product.price * cartItems[item];
     }
 
-    if (user.availableMoney < totalPrice) {
-      return res.status(400).json({ type: ProductErrors.NO_AVAILABLE_MONEY });
-    }
-
-    user.availableMoney -= totalPrice;
     user.purchasedItems.push(...productIDs);
 
     await user.save();
